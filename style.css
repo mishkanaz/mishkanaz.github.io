@@ -7,3 +7,14 @@ body {
 canvas {
     display: block;
 }
+
+#game {
+    position: fixed;
+    z-index: 1;
+}
+
+#darkness {
+    position: fixed;
+    z-index: 2;
+    pointer-events: none;
+}

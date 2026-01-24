@@ -1,8 +1,11 @@
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+const darkCanvas = document.getElementById("darkness");
+const darkCtx = darkCanvas.getContext("2d");
+
+canvas.width = darkCanvas.width = window.innerWidth;
+canvas.height = darkCanvas.height = window.innerHeight;
 
 let camera = { x: 0, y: 0};
 
@@ -12,21 +15,36 @@ const buildings = [
     {x: 700, y: 100, w: 160, h: 100, label: "Contact", text: "email: beepbeepblepboop"}
 ];
 
+const player = {
+    x: 200,
+    y: 200,
+    w: 40,
+    h: 40,
+    speed: 3
+};
+
 let hoveredBuilding = null;
 let activeBuilding = null;
 
+let mouseX = canvas.width/2;
+let mouseY = canvas.height/2;
+let torch = {x: mouseX, y: mouseY, radius: 120};
+
 canvas.addEventListener("mousemove", e => {
-    const mouseX = e.clientX + camera.x;
-    const mouseY = e.clientY + camera.y;
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+
+    const worldX = mouseX + camera.x;
+    const worldY = mouseY + camera.y;
 
     hoveredBuilding = null;
 
     for(const b of buildings) {
         if (
-            mouseX >= b.x &&
-            mouseX <= b.x + b.w &&
-            mouseY >= b.y &&
-            mouseY <= b.y + b.h
+            worldX >= b.x &&
+            worldX <= b.x + b.w &&
+            worldY >= b.y &&
+            worldY <= b.y + b.h
         ) {
             hoveredBuilding = b;
             break;
@@ -43,21 +61,26 @@ canvas.addEventListener("click", () => {
 });
 
 const keys = {};
-window.addEventListener("keydown", e => keys[e.key] = true);
-window.addEventListener("keyup", e => keys[e.key] = false);
+window.addEventListener("keydown", e => keys[e.key.toLowerCase()] = true);
+window.addEventListener("keyup", e => keys[e.key.toLowerCase()] = false);
 
 function update() {
     const speed = 5;
-    if (keys["ArrowUp"]) camera.y -= speed;
-    if (keys["ArrowDown"]) camera.y += speed;
-    if (keys["ArrowLeft"]) camera.x -= speed;
-    if (keys["ArrowRight"]) camera.x += speed;
+    if (keys["arrowup"] || keys["w"]) player.y -= player.speed;
+    if (keys["arrowdown"] || keys["s"]) player.y += player.speed;
+    if (keys["arrowleft"] || keys["a"]) player.x -= player.speed;
+    if (keys["arrowright"] || keys["d"]) player.x += player.speed;
+
+    camera.x = player.x - canvas.width / 2 + player.w/2;
+    camera.y = player.y - canvas.height / 2 + player.h /2;
+
+    torch.x += (mouseX - torch.x) * 0.1;
+    torch.y += (mouseY - torch.y) * 0.1;
 }
 
 function drawWorld(){
 
-    ctx.fillStyle = "#111";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     for(const b of buildings) {
         ctx.fillStyle = (b === hoveredBuilding) ? "#ccc" : "#888";
@@ -67,6 +90,8 @@ function drawWorld(){
         ctx.font = "14px monospace";
         ctx.fillText(b.label, b.x - camera.x + 10, b.y - camera.y + 20);
     }
+    ctx.fillStyle = "white";
+        ctx.fillRect(player.x - camera.x, player.y - camera.y, player.w, player.h);
 
     if(activeBuilding){
         const boxWidth = 300;
@@ -85,7 +110,23 @@ function drawWorld(){
         ctx.font = "16px monospace";
         wrapText(ctx, activeBuilding.text, x + 10, y + 25, boxWidth - 20, 20);
         }
-}
+
+    darkCtx.clearRect(0, 0, darkCanvas.width, darkCanvas.height);
+    darkCtx.fillStyle = "rgba(0, 0, 0, 0.9)";
+    darkCtx.fillRect(0, 0, darkCanvas.width, darkCanvas.height);
+
+   
+  darkCtx.globalCompositeOperation = "destination-out";
+  darkCtx.beginPath();
+  darkCtx.arc(mouseX, mouseY, 120, 0, Math.PI*2);
+  darkCtx.fill();
+  darkCtx.globalCompositeOperation = "source-over";
+    
+        
+       
+    }
+
+
 
 function wrapText(ctx, text, x, y, maxWidth, lineHeight){
     const words = text.split(' ');
