@@ -10,9 +10,9 @@ canvas.height = darkCanvas.height = window.innerHeight;
 let camera = { x: 0, y: 0};
 
 const buildings = [
-    {x: 100, y: 100, w: 150, h: 100, label: "About Me", text: "hey stupid"},
-    {x: 400, y: 200, w: 180, h: 120, label: "Projects", text: "Here is some stuff i made"},
-    {x: 700, y: 100, w: 160, h: 100, label: "Contact", text: "email: beepbeepblepboop"}
+    {x: 100, y: 100, w: 150, h: 100, label: "Welcome!", text: "Coming soon"},
+    {x: 400, y: 200, w: 180, h: 120, label: "song of the week", text: "coming soon"},
+    {x: 700, y: 100, w: 160, h: 100, label: "blog", text: "coming soon"}
 ];
 
 const player = {
@@ -20,7 +20,7 @@ const player = {
     y: 200,
     w: 40,
     h: 40,
-    speed: 3
+    speed: 2
 };
 
 let hoveredBuilding = null;
@@ -112,7 +112,7 @@ function drawWorld(){
         }
 
     darkCtx.clearRect(0, 0, darkCanvas.width, darkCanvas.height);
-    darkCtx.fillStyle = "rgba(0, 0, 0, 0.9)";
+    darkCtx.fillStyle = "rgba(0, 0, 0, 0.95)";
     darkCtx.fillRect(0, 0, darkCanvas.width, darkCanvas.height);
 
    
